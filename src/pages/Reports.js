@@ -14,6 +14,9 @@ import {
 const Reports = () => {
   const [reportData, setReportData] = useState([]);
 
+  // ✅ Use deployed backend base URL
+  const API_BASE = "https://timesheet-backend-ra46.onrender.com";
+
   const fetchEntries = async () => {
     try {
       const userId = localStorage.getItem("userId");
@@ -25,8 +28,8 @@ const Reports = () => {
         return;
       }
 
-      // ✅ Fetch user’s timesheet data from backend
-      const res = await axios.get(`http://localhost:5000/api/timesheet/${userId}`, {
+      // ✅ Update API call to deployed backend
+      const res = await axios.get(`${API_BASE}/api/timesheet/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -64,9 +67,6 @@ const Reports = () => {
     fetchEntries();
   }, []);
 
-
-
-
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar */}
@@ -81,11 +81,32 @@ const Reports = () => {
         <h2 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "30px" }}>
           Timesheet App
         </h2>
-        <div className="nav-links" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <a href="/dashboard" style={{ color: "white", textDecoration: "none" }}>Dashboard</a>
-          <a href="/reports" style={{ color: "#FBBF24", fontWeight: "bold",textDecoration: "none" }}>Reports</a>
-          <a href="/employees" style={{ color:"white", fontWeight: "bold", textDecoration: "none" }}>Employees</a>
-          <a href="/settings" style={{ color: "white", textDecoration: "none" }}>Settings</a>
+        <div
+          className="nav-links"
+          style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+        >
+          <a href="/dashboard" style={{ color: "white", textDecoration: "none" }}>
+            Dashboard
+          </a>
+          <a
+            href="/reports"
+            style={{
+              color: "#FBBF24",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
+          >
+            Reports
+          </a>
+          <a
+            href="/employees"
+            style={{ color: "white", fontWeight: "bold", textDecoration: "none" }}
+          >
+            Employees
+          </a>
+          <a href="/settings" style={{ color: "white", textDecoration: "none" }}>
+            Settings
+          </a>
         </div>
 
         <div style={{ position: "absolute", bottom: "20px" }}>
@@ -114,44 +135,45 @@ const Reports = () => {
           </button>
         </div>
       </nav>
-    <div style={{ padding: "30px" }}>
-      <h2 style={{ fontWeight: "bold", fontSize: "24px" }}>Reports Page</h2>
 
-      <div
-        style={{
-          background: "white",
-          borderRadius: "10px",
-          padding: "20px",
-          marginTop: "20px",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Daily Hours Summary
-        </h3>
+      <div style={{ padding: "30px" }}>
+        <h2 style={{ fontWeight: "bold", fontSize: "24px" }}>Reports Page</h2>
 
-        {reportData.length === 0 ? (
-          <p style={{ textAlign: "center" }}>
-            No data available. Add entries in the Dashboard.
-          </p>
-        ) : (
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart
-              data={reportData}
-              margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="hours" fill="#1E3A8A" name="Hours Worked" />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "10px",
+            padding: "20px",
+            marginTop: "20px",
+            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
+            Daily Hours Summary
+          </h3>
+
+          {reportData.length === 0 ? (
+            <p style={{ textAlign: "center" }}>
+              No data available. Add entries in the Dashboard.
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart
+                data={reportData}
+                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="hours" fill="#1E3A8A" name="Hours Worked" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </div>
     </div>
-  </div>  
   );
 };
 

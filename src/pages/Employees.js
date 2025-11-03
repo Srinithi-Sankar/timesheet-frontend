@@ -4,7 +4,9 @@ import axios from "axios";
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [username, setUsername] = useState("");
-  
+
+  // ✅ Use deployed backend base URL
+  const API_BASE = "https://timesheet-backend-ra46.onrender.com";
 
   // Fetch all registered users
   const fetchEmployees = async () => {
@@ -17,7 +19,8 @@ const Employees = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:5000/api/auth/users", {
+      // ✅ Correct Render API route
+      const response = await axios.get(`${API_BASE}/auth/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -30,16 +33,14 @@ const Employees = () => {
     }
   };
 
-  
   useEffect(() => {
-  const storedUsername = localStorage.getItem("username");
-  if (storedUsername) {
-    setUsername(storedUsername);
-  }
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
 
-  fetchEmployees();
-}, []);
-
+    fetchEmployees();
+  }, []);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
@@ -57,7 +58,7 @@ const Employees = () => {
         </h2>
         <div className="nav-links" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <a href="/dashboard" style={{ color: "white", textDecoration: "none" }}>Dashboard</a>
-          <a href="/reports" style={{ color: "white",textDecoration: "none" }}>Reports</a>
+          <a href="/reports" style={{ color: "white", textDecoration: "none" }}>Reports</a>
           <a href="/employees" style={{ color: "#FBBF24", fontWeight: "bold", textDecoration: "none" }}>Employees</a>
           <a href="/settings" style={{ color: "white", textDecoration: "none" }}>Settings</a>
         </div>
@@ -139,7 +140,6 @@ const Employees = () => {
                     <td style={{ padding: "12px", textTransform: "capitalize" }}>
                       {emp.username || emp.name || emp.email.split("@")[0]}
                     </td>
-
                     <td style={{ padding: "12px" }}>{emp.email}</td>
                   </tr>
                 ))}

@@ -12,8 +12,8 @@ const Dashboard = () => {
   const [clockInTime, setClockInTime] = useState(null);
   const [isClockedIn, setIsClockedIn] = useState(false);
 
-  // ✅ Use your Render backend URL
-  const API_BASE = "https://timesheet-backend-ra46.onrender.com/api";
+  // ✅ Correct backend base URL (no /api)
+  const API_BASE = "https://timesheet-backend-ra46.onrender.com";
 
   // Fetch entries for the logged-in user
   const fetchEntries = async () => {
@@ -27,7 +27,8 @@ const Dashboard = () => {
         return;
       }
 
-      const res = await axios.get(`${API_BASE}/timesheets/${userId}`, {
+      // ✅ Correct route
+      const res = await axios.get(`${API_BASE}/timesheet/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -52,8 +53,9 @@ const Dashboard = () => {
     }
 
     try {
+      // ✅ Correct route
       await axios.post(
-        `${API_BASE}/timesheet`, // ✅ changed from localhost
+        `${API_BASE}/timesheet`,
         { userId, date, project, task, hours, description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -83,6 +85,7 @@ const Dashboard = () => {
 
       if (!window.confirm("Are you sure you want to delete this entry?")) return;
 
+      // ✅ Correct route
       await axios.delete(`${API_BASE}/timesheet/${entryId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,7 +140,6 @@ const Dashboard = () => {
       fetchEntries();
     }
 
-    // Restore clock state if user navigated away
     const savedClockIn = localStorage.getItem("clockInTime");
     const savedIsClockedIn = localStorage.getItem("isClockedIn") === "true";
     if (savedClockIn && savedIsClockedIn) {
@@ -145,6 +147,9 @@ const Dashboard = () => {
       setIsClockedIn(true);
     }
   }, []);
+
+ 
+
 
   return (
     // ✅ The rest of your UI remains unchanged
