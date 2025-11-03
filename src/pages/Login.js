@@ -16,8 +16,9 @@ const handleLogin = async (e) => {
   try {
     const { data } = await API.post("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.user.id);
+    localStorage.setItem("userId", data.user._id);
     localStorage.setItem("username", data.user.name);
+    localStorage.setItem("email", data.user.email);
     alert("Login successful!");
     navigate("/dashboard");
   } catch (error) {
