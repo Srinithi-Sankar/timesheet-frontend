@@ -9,16 +9,20 @@ const Login = () => {
   const navigate = useNavigate();
 
 
-
 const handleLogin = async (e) => {
   e.preventDefault();
-
   try {
     const { data } = await API.post("/auth/login", { email, password });
+
+    // Log what backend returns
+    console.log("Login response:", data);
+
+    // Use _id instead of id
     localStorage.setItem("token", data.token);
     localStorage.setItem("userId", data.user._id);
     localStorage.setItem("username", data.user.name);
     localStorage.setItem("email", data.user.email);
+
     alert("Login successful!");
     navigate("/dashboard");
   } catch (error) {
