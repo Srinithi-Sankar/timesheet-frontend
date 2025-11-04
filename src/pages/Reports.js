@@ -14,7 +14,7 @@ import {
 const Reports = () => {
   const [reportData, setReportData] = useState([]);
 
-  // ✅ Use deployed backend base URL
+  // ✅ Use your deployed backend base URL
   const API_BASE = "https://timesheet-backend-ra46.onrender.com";
 
   const fetchEntries = async () => {
@@ -23,12 +23,12 @@ const Reports = () => {
       const token = localStorage.getItem("token");
 
       if (!userId || !token) {
-        alert("Please log in again.");
+        alert("Session expired. Please log in again.");
         window.location.href = "/login";
         return;
       }
 
-      // ✅ Update API call to deployed backend
+      // ✅ Get all timesheet entries for the logged-in user
       const res = await axios.get(`${API_BASE}/api/timesheet/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -36,17 +36,17 @@ const Reports = () => {
       const entries = res.data || [];
 
       // ✅ Group total hours by date
-      const dateData = {};
+      const grouped = {};
       entries.forEach((entry) => {
         const date = new Date(entry.date);
-        const formattedDate = date.toLocaleDateString("en-GB"); // e.g. 30/10/2025
-        dateData[formattedDate] = (dateData[formattedDate] || 0) + Number(entry.hours || 0);
+        const formatted = date.toLocaleDateString("en-GB");
+        grouped[formatted] = (grouped[formatted] || 0) + Number(entry.hours || 0);
       });
 
-      // ✅ Convert to recharts format
-      const chartData = Object.keys(dateData).map((date) => ({
+      // ✅ Convert to chart-friendly format
+      const chartData = Object.keys(grouped).map((date) => ({
         date,
-        hours: dateData[date],
+        hours: grouped[date],
       }));
 
       // ✅ Sort by date (oldest → newest)
