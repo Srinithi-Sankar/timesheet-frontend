@@ -14,36 +14,39 @@ import {
 const Reports = () => {
   const [reportData, setReportData] = useState([]);
 
-  // ✅ Use your deployed backend base URL
-  const API_BASE = "https://timesheet-backend-ra46.onrender.com";
+  // ✅ Use the same backend base URL as in Timesheet.js
+  const API_BASE = process.env.REACT_APP_API_URL || "https://timesheet-backend-ra46.onrender.com";
 
   const fetchEntries = async () => {
     try {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
 
-      if (!userId || !token) {
+      if (!token || !userId) {
         alert("Session expired. Please log in again.");
         window.location.href = "/login";
         return;
       }
 
-      // ✅ Get all timesheet entries for the logged-in user
-      const res = await axios.get(`${API_BASE}/api/timesheet/${userId}`, {
+      // ✅ Match the working route in your backend
+      const res = await axios.get(`${API_BASE}/timesheet`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const entries = res.data || [];
 
+      // ✅ Filter only this user's entries (in case backend returns all)
+      const userEntries = entries.filter((e) => e.userId === userId);
+
       // ✅ Group total hours by date
       const grouped = {};
-      entries.forEach((entry) => {
+      userEntries.forEach((entry) => {
         const date = new Date(entry.date);
         const formatted = date.toLocaleDateString("en-GB");
         grouped[formatted] = (grouped[formatted] || 0) + Number(entry.hours || 0);
       });
 
-      // ✅ Convert to chart-friendly format
+      // ✅ Convert grouped data into chart format
       const chartData = Object.keys(grouped).map((date) => ({
         date,
         hours: grouped[date],
