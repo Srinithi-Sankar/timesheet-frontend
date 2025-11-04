@@ -18,17 +18,16 @@ const Dashboard = () => {
   // Fetch entries for the logged-in user
   const fetchEntries = async () => {
     try {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
 
-      if (!userId || !token) {
+      if (!token) {
         alert("Please log in again.");
         window.location.href = "/login";
         return;
       }
 
-      // ✅ Correct route
-      const res = await axios.get(`${API_BASE}/timesheet/${userId}`, {
+      // ✅ FIXED: use correct route `/timesheet`
+      const res = await axios.get(`${API_BASE}/timesheet`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -53,9 +52,9 @@ const Dashboard = () => {
     }
 
     try {
-      // ✅ Correct route
+      // ✅ FIXED: correct route `/timesheet/add`
       await axios.post(
-        `${API_BASE}/timesheet`,
+        `${API_BASE}/timesheet/add`,
         { userId, date, project, task, hours, description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -85,7 +84,7 @@ const Dashboard = () => {
 
       if (!window.confirm("Are you sure you want to delete this entry?")) return;
 
-      // ✅ Correct route
+      // ✅ correct route stays same
       await axios.delete(`${API_BASE}/timesheet/${entryId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -147,8 +146,6 @@ const Dashboard = () => {
       setIsClockedIn(true);
     }
   }, []);
-
- 
 
 
   return (
