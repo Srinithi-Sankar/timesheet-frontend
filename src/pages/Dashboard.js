@@ -168,6 +168,19 @@ const Dashboard = () => {
       setIsClockedIn(true);
     }
   }, []);
+  // Helper: convert decimal hours (e.g., 1.1) → "1 hr 6 min"
+const formatHours = (decimalHours) => {
+  if (!decimalHours || isNaN(decimalHours)) return "-";
+  const totalMinutes = Math.round(decimalHours * 60);
+  const hrs = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  if (hrs > 0) {
+    return `${hrs} hr${hrs > 1 ? "s" : ""}${mins > 0 ? ` ${mins} min` : ""}`;
+  } else {
+    return `${mins} min`;
+  }
+};
+
 
 
   return (
@@ -369,7 +382,8 @@ const Dashboard = () => {
                       <td>{new Date(entry.date).toLocaleDateString()}</td>
                       <td>{entry.project}</td>
                       <td>{entry.task}</td>
-                      <td>{entry.hours}</td>
+                      <td>{formatHours(entry.hours)}</td>
+
                       <td>{entry.description || "-"}</td>
                       <td>
                         <button
