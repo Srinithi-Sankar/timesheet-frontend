@@ -13,46 +13,37 @@ import {
 
 const Reports = () => {
   const [reportData, setReportData] = useState([]);
-
-  // ✅ Use the same backend base URL as in Timesheet.js
-  const API_BASE = process.env.REACT_APP_API_URL || "https://timesheet-backend-ra46.onrender.com";
+  const API_BASE = "https://timesheet-backend-ra46.onrender.com";
 
   const fetchEntries = async () => {
     try {
       const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
-
-      if (!token || !userId) {
+      if (!token) {
         alert("Session expired. Please log in again.");
         window.location.href = "/login";
         return;
       }
 
-      // ✅ Match the working route in your backend
+      // ✅ Correct endpoint
       const res = await axios.get(`${API_BASE}/timesheet`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const entries = res.data || [];
 
-      // ✅ Filter only this user's entries (in case backend returns all)
-      const userEntries = entries.filter((e) => e.userId === userId);
-
-      // ✅ Group total hours by date
+      // ✅ Group hours by date
       const grouped = {};
-      userEntries.forEach((entry) => {
+      entries.forEach((entry) => {
         const date = new Date(entry.date);
         const formatted = date.toLocaleDateString("en-GB");
         grouped[formatted] = (grouped[formatted] || 0) + Number(entry.hours || 0);
       });
 
-      // ✅ Convert grouped data into chart format
       const chartData = Object.keys(grouped).map((date) => ({
         date,
         hours: grouped[date],
       }));
 
-      // ✅ Sort by date (oldest → newest)
       chartData.sort((a, b) => {
         const [da, ma, ya] = a.date.split("/").map(Number);
         const [db, mb, yb] = b.date.split("/").map(Number);
@@ -60,15 +51,18 @@ const Reports = () => {
       });
 
       setReportData(chartData);
-    } catch (error) {
-      console.error("Error fetching report data:", error);
-      alert("Failed to load report data.");
+    } catch (err) {
+      console.error("❌ Error fetching report data:", err);
+      alert("Failed to fetch report data. Check backend logs or CORS settings.");
     }
   };
 
   useEffect(() => {
     fetchEntries();
   }, []);
+
+
+
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>

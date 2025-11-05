@@ -4,36 +4,33 @@ import axios from "axios";
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [username, setUsername] = useState("");
-
-  // ✅ Use your deployed backend base URL
   const API_BASE = "https://timesheet-backend-ra46.onrender.com";
 
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem("token");
-
       if (!token) {
-        alert("Session expired. Please log in again.");
+        alert("Please log in again.");
         window.location.href = "/login";
         return;
       }
 
-      // ✅ Fetch all users from backend
       const response = await axios.get(`${API_BASE}/auth/users`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setEmployees(response.data || []);
     } catch (error) {
-      console.error("Error fetching employees:", error);
-      alert("Failed to load employees.");
+      console.error("❌ Error fetching employees:", error);
+      alert("Failed to fetch employees. Please try again.");
     }
   };
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
     if (storedUsername) setUsername(storedUsername);
-
     fetchEmployees();
   }, []);
 
