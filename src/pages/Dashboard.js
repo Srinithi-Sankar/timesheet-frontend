@@ -39,38 +39,51 @@ const Dashboard = () => {
   };
 
   // Add new entry
-  const handleAddEntry = async (e) => {
-    e.preventDefault();
+ const handleAddEntry = async (e) => {
+  e.preventDefault();
 
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
 
-    if (!userId || !token) {
-      alert("User not found. Please log in again.");
-      window.location.href = "/login";
-      return;
+  if (!userId || !token) {
+    alert("User not found. Please log in again.");
+    window.location.href = "/login";
+    return;
+  }
+
+  try {
+    // 🧮 Convert formatted "1 hr 6 min" → numeric total hours
+    let numericHours = 0;
+    if (hours.includes("hr")) {
+      const [hrPart, minPart] = hours.split("hr");
+      const h = parseInt(hrPart.trim()) || 0;
+      const m = parseInt(minPart) || 0;
+      numericHours = h + m / 60;
+    } else if (hours.includes("min")) {
+      numericHours = parseInt(hours) / 60 || 0;
+    } else {
+      numericHours = Number(hours) || 0;
     }
 
-    try {
-      // ✅ FIXED: correct route `/timesheet/add`
-      await axios.post(
-        `${API_BASE}/timesheet/add`,
-        { userId, date, project, task, hours, description },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    await axios.post(
+      `${API_BASE}/timesheet/add`,
+      { userId, date, project, task, hours: numericHours, description },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      alert("Entry added successfully!");
-      setDate("");
-      setProject("");
-      setTask("");
-      setHours("");
-      setDescription("");
-      fetchEntries();
-    } catch (error) {
-      console.error("Error adding entry:", error);
-      alert("Failed to add entry. Please try again.");
-    }
-  };
+    alert("Entry added successfully!");
+    setDate("");
+    setProject("");
+    setTask("");
+    setHours("");
+    setDescription("");
+    fetchEntries();
+  } catch (error) {
+    console.error("Error adding entry:", error);
+    alert("Failed to add entry. Please try again.");
+  }
+};
+
 
   // Delete an entry
   const handleDeleteEntry = async (entryId) => {
@@ -108,22 +121,31 @@ const Dashboard = () => {
     alert("Clocked in successfully!");
   };
 
-  const handleClockOut = () => {
-    if (!isClockedIn || !clockInTime) return;
+ const handleClockOut = () => {
+  if (!isClockedIn || !clockInTime) return;
 
-    const clockOutTime = new Date();
-    const diffMs = clockOutTime - new Date(clockInTime);
-    const diffHrs = (diffMs / (1000 * 60 * 60)).toFixed(2);
+  const clockOutTime = new Date();
+  const diffMs = clockOutTime - new Date(clockInTime);
 
-    setHours(diffHrs);
-    setIsClockedIn(false);
-    setClockInTime(null);
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const hoursPart = Math.floor(totalMinutes / 60);
+  const minutesPart = totalMinutes % 60;
 
-    localStorage.removeItem("clockInTime");
-    localStorage.removeItem("isClockedIn");
+  // 🕒 Save display-friendly string like "1 hr 6 min" or "16 min"
+  const formattedTime =
+    hoursPart > 0
+      ? `${hoursPart} hr${hoursPart > 1 ? "s" : ""} ${minutesPart} min`
+      : `${minutesPart} min`;
 
-    alert(`Clocked out! Total time: ${diffHrs} hours`);
-  };
+  setHours(formattedTime);
+  setIsClockedIn(false);
+  setClockInTime(null);
+
+  localStorage.removeItem("clockInTime");
+  localStorage.removeItem("isClockedIn");
+
+  alert(`Clocked out! Total time: ${formattedTime}`);
+};
 
   useEffect(() => {
     const storedName = localStorage.getItem("username");
@@ -278,12 +300,13 @@ const Dashboard = () => {
 
             {/* Hours auto-filled after Clock Out */}
             <input
-              type="number"
-              placeholder="Hours (auto-filled)"
-              value={hours}
-              readOnly
-              style={{ backgroundColor: "#f3f4f6", cursor: "not-allowed" }}
+            type="text"
+            placeholder="Time worked (auto-filled, e.g. 1 hr 6 min)"
+            value={hours}
+            readOnly
+            style={{ backgroundColor: "#f3f4f6", cursor: "not-allowed" }}
             />
+
 
             <textarea
               placeholder="Description (optional)"
