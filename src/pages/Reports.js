@@ -161,8 +161,26 @@ const Reports = () => {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
+                <YAxis
+                tickFormatter={(value) => {
+                const totalMinutes = Math.round(value * 60);
+                const hrs = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+                }}
+                />
+
+                <Tooltip
+                formatter={(value) => {
+                const totalMinutes = Math.round(value * 60);
+                const hrs = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                if (hrs > 0) {
+                  return `${hrs} hr${hrs > 1 ? "s" : ""}${mins > 0 ? ` ${mins} min` : ""}`;
+                }
+                return `${mins} min`;
+                }}/>
+
                 <Legend />
                 <Bar dataKey="hours" fill="#1E3A8A" name="Hours Worked" />
               </BarChart>
